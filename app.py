@@ -1,13 +1,31 @@
 import streamlit as st
 import torch
 import sentencepiece as spm
+import torch.nn as nn
+
+# Define Model Architecture (Modify this according to your model)
+class TransformerModel(nn.Module):
+    def __init__(self, input_dim, output_dim):
+        super(TransformerModel, self).__init__()
+        self.embedding = nn.Embedding(input_dim, 256)  
+        self.fc = nn.Linear(256, output_dim)  
+
+    def forward(self, x):
+        x = self.embedding(x)
+        x = self.fc(x)
+        return x
 
 # Load Tokenizer
 sp = spm.SentencePieceProcessor()
 sp.load("bpe.model")
 
-# Load Model
-model = torch.load("transformer_model.pth", map_location=torch.device('cpu'))
+# Initialize Model (Modify input_dim and output_dim as per your model)
+input_dim = 5000  # Example vocabulary size
+output_dim = 5000  # Example output size
+model = TransformerModel(input_dim, output_dim)
+
+# Load State Dict (instead of torch.load)
+model.load_state_dict(torch.load("transformer_model.pth", map_location=torch.device('cpu')))
 model.eval()
 
 def generate_code(input_text):
